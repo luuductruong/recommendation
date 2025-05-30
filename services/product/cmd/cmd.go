@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/recommendation/services/core/infra/logger"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"net"
 
 	"github.com/recommendation/services/core/application/middleware"
@@ -36,7 +37,8 @@ func Run() {
 	}
 
 	productDomain := domain.NewDomain(&domain.ProductDomainParam{
-		ProductRepo: repo.NewProductRepo(),
+		ProductRepo:     repo.NewProductRepo(),
+		ProductViewRepo: repo.NewProductViewRepo(),
 	})
 	grpcHandler = handler.NewHandler(productDomain)
 
@@ -54,5 +56,6 @@ func grpcServe() {
 	defer serve.GracefulStop()
 
 	appService.RegisterProductServiceServer(serve, grpcHandler)
+	reflection.Register(serve)
 	logger.Default.Fatal(serve.Serve(lis))
 }

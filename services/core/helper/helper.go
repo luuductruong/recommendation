@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"github.com/google/uuid"
 	"math/rand"
 	"time"
 )
@@ -31,4 +32,8 @@ func RandString(n int) string {
 	}
 
 	return string(b)
+}
+
+func NewStringUUID() string {
+	return uuid.New().String()
 }

@@ -2,9 +2,11 @@ package domain
 
 import (
 	"errors"
+	"time"
 
 	"github.com/recommendation/services/core/context"
 	"github.com/recommendation/services/core/domain/product"
+	"github.com/recommendation/services/core/helper"
 )
 
 func (d *domain) GetProductDetail(ctx context.Context, inp *product.GetProductDetailInp) (*product.Product, error) {
@@ -24,10 +26,44 @@ func (d *domain) GetProductDetail(ctx context.Context, inp *product.GetProductDe
 		return nil, errors.New("product not found")
 	}
 	//put back job for record user history
-	go d.updateUserHistory(ctx, inp.UserID, prod)
+	go d.updateUserViewHistory(ctx.Clone(), inp.UserID, prod)
 	return prod, nil
 }
 
-func (d *domain) updateUserHistory(ctx context.Context, userID string, prod *product.Product) {
-
+func (d *domain) updateUserViewHistory(ctx context.Context, userID string, prod *product.Product) {
+	if prod == nil {
+		return
+	}
+	d.logger.DebugCtx(ctx, "updateUserViewHistory with prod:", prod)
+	// query by user_id, product_id
+	existView, err := d.productViewRepo.Query(ctx).
+		ByUserID(userID).
+		ByProductID(prod.ProductID).
+		Result()
+	if err != nil {
+		d.logger.ErrorCtx(ctx, err, "Error querying product view")
+		return
+	}
+	if existView != nil {
+		d.logger.DebugCtx(ctx, "updateUserViewHistory with exist view:", existView)
+		//update
+		existView.ViewAt = time.Now()
+		err = d.productViewRepo.Upsert(ctx, existView)
+		if err != nil {
+			d.logger.ErrorCtx(ctx, err, "Error upserting product view")
+		}
+		return
+	}
+	d.logger.DebugCtx(ctx, "updateUserViewHistory with nil view")
+	newView := &product.ProductView{
+		ID:        helper.NewStringUUID(),
+		ViewAt:    time.Now(),
+		ProductID: prod.ProductID,
+		UserID:    userID,
+	}
+	err = d.productViewRepo.Upsert(ctx, newView)
+	if err != nil {
+		d.logger.ErrorCtx(ctx, err, "Error upserting product view")
+	}
+	return
 }

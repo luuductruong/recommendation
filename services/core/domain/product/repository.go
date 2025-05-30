@@ -13,3 +13,19 @@ type ProductQuery interface {
 	Result() (*Product, error)
 	ResultList() ([]*Product, error)
 }
+
+type ProductViewRepo interface {
+	// input
+	Upsert(ctx context.Context, product *ProductView) error
+	// query
+	Query(ctx context.Context) ProductViewQuery
+}
+
+type ProductViewQuery interface {
+	// query
+	ByProductID(productID int64) ProductViewQuery
+	ByUserID(userID string) ProductViewQuery
+	// result
+	Result() (*ProductView, error)
+	ResultList() ([]*ProductView, error)
+}
