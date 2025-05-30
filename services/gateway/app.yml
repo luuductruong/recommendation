@@ -1,0 +1,14 @@
+http:
+  host: localhost
+  port: 8000
+
+product:
+  host: localhost
+  port: 8001
+
+logger:
+  output: stdout
+  file:
+  level: debug
+  format: text
+  expecting_line: true

@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/recommendation/services/core/infra/logger"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 
 	"github.com/recommendation/services/core/application/middleware"
@@ -26,12 +26,13 @@ func Run() {
 	//appConfig = &Config{}
 	err = config.LoadConfig(&appConfig)
 	if err != nil {
-		log.Fatal(err)
+		logger.Default.Panic("Error loading config: ", err)
 	}
+	log := logger.NewLogger(appConfig.Logger)
+	logger.SetDefault(log)
 	sql, err = db.NewSQL(appConfig.DataBase)
 	if err != nil {
-		fmt.Println("ERRRRRRRRRRRRR ", err)
-		//log.Fatal(err)
+		logger.Default.Panic("Error connecting to database: ", err)
 	}
 
 	productDomain := domain.NewDomain(&domain.ProductDomainParam{
@@ -44,14 +45,14 @@ func Run() {
 
 func grpcServe() {
 	// Start gRPC server in goroutine
-	lis, err := net.Listen("tcp", ":8003")
+	lis, err := net.Listen("tcp", appConfig.Grpc.Address())
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.Default.Panic("failed to listen: %v", err)
 	}
 	fmt.Println("grpc server listening on :", lis.Addr().String())
 	serve := middleware.NewServer(grpc.UnaryInterceptor(middleware.GrpcChainUnaryServer(sql)))
 	defer serve.GracefulStop()
 
 	appService.RegisterProductServiceServer(serve, grpcHandler)
-	log.Fatal(serve.Serve(lis))
+	logger.Default.Fatal(serve.Serve(lis))
 }

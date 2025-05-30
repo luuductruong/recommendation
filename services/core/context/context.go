@@ -17,8 +17,13 @@ func FromContext(ctx context.Context) Context {
 type Context interface {
 	context.Context
 	GetDbTx() *gorm.DB
+	GetTracerId() string
 }
 
 func (c *ctxInternal) GetDbTx() *gorm.DB {
 	return middleware.DbTxFromContext(c)
+}
+
+func (c *ctxInternal) GetTracerId() string {
+	return middleware.TracerFromContext(c)
 }

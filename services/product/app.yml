@@ -1,7 +1,18 @@
+grpc:
+  host: localhost
+  port: 8001
+
+logger:
+  output: stdout
+  file:
+  level: debug
+  format: text
+  expecting_line: true
+
 database:
   host: localhost
   port: 15432
   user: recommendation
   password: recommendation
   dbname: recommendation
-  ssl: true
+  ssl: false

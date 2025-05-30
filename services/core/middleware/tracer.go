@@ -1,0 +1,40 @@
+package middleware
+
+import (
+	"context"
+	"github.com/recommendation/services/core/helper"
+	"github.com/recommendation/services/core/infra/trace"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+)
+
+const TracerCtxKey = "tracerCtx"
+
+// GrpcTracerId create and add tracerId to context
+func GrpcTracerId() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		md, _ := metadata.FromIncomingContext(ctx)
+		tracer := md.Get(TracerCtxKey)
+		if len(tracer) == 0 {
+			traceId := trace.TraceIdFromContext(ctx)
+			if traceId == "" || traceId == "00000000000000000000000000000000" {
+				tracer = []string{helper.RandString(16)}
+			} else {
+				tracer = []string{traceId}
+			}
+		}
+		ctx = context.WithValue(ctx, TracerCtxKey, tracer[0])
+		ctx = metadata.AppendToOutgoingContext(ctx, TracerCtxKey, tracer[0])
+		header := metadata.Pairs(TracerCtxKey, tracer[0])
+		err := grpc.SetHeader(ctx, header)
+		if err != nil {
+			return nil, err
+		}
+		return handler(ctx, req)
+	}
+}
+
+func TracerFromContext(ctx context.Context) string {
+	raw, _ := ctx.Value(TracerCtxKey).(string)
+	return raw
+}

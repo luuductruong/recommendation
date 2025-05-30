@@ -11,7 +11,7 @@ import "google/api/annotations.proto";
 service ProductService {
   rpc GetProductDetail(dto.GetProductDetailReq) returns (dto.GetProductDetailResp) {
     option (google.api.http) = {
-      post: "/v1/product/{product_id}/detail"
+      post: "/v1/product/detail" // TODO change method to GET, detect user_id from header, product_id from url
       body: "*"
     };
   }

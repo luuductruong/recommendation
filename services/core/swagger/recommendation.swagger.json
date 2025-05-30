@@ -16,6 +16,32 @@
     "application/json"
   ],
   "paths": {
+    "/v1/product/detail": {
+      "post": {
+        "operationId": "ProductService_GetProductDetail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dtoGetProductDetailResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dtoGetProductDetailReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
     "/v1/product/user/recommendation": {
       "post": {
         "operationId": "ProductService_GetRecommendationForUser",
@@ -41,48 +67,22 @@
           "ProductService"
         ]
       }
-    },
-    "/v1/product/{product_id}/detail": {
-      "post": {
-        "operationId": "ProductService_GetProductDetail",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/dtoGetProductDetailResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "product_id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "user_id": {
-                  "type": "string",
-                  "title": "TODO change user_id to header, detect from bearer token"
-                }
-              }
-            }
-          }
-        ],
-        "tags": [
-          "ProductService"
-        ]
-      }
     }
   },
   "definitions": {
+    "dtoGetProductDetailReq": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "TODO change user_id to header, detect from bearer token"
+        },
+        "product_id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "dtoGetProductDetailResp": {
       "type": "object",
       "properties": {

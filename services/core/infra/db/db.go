@@ -42,6 +42,8 @@ func NewSQL(c *Config) (SQL, error) {
 	connectionString := host + " " + user + " " + password + " " + port + " " + dbname
 	if c.SSL {
 		connectionString += " sslmode=require"
+	} else {
+		connectionString += " sslmode=disable"
 	}
 	db, err := gorm.Open(postgres.Open(connectionString))
 	if err != nil {
