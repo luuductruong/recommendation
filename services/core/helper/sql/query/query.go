@@ -2,6 +2,7 @@ package query
 
 import (
 	"errors"
+	"fmt"
 	"github.com/recommendation/services/core/helper"
 	"gorm.io/gorm"
 )
@@ -49,6 +50,13 @@ func Where[I BaseQuery](bq I, statement string, args ...any) I {
 	return bq
 }
 
+// order func
+func OrderBy[I any](bq I, field string, desc bool) I {
+	db := any(bq).(BaseQuery)
+	db.SetDB(db.GetDB().Order(getOrderByStr(field, desc)))
+	return bq
+}
+
 // result func
 func Result[S any, D any](bq BaseQuery, mapper func(s *S) *D) (*D, error) {
 	var rs S
@@ -73,4 +81,11 @@ func ResultList[S any, D any](bq BaseQuery, mapper func(s *S) *D) ([]*D, error) 
 		return nil, err
 	}
 	return helper.MapList(rs, mapper), nil
+}
+
+func getOrderByStr(field string, desc bool) string {
+	if desc {
+		return fmt.Sprintf("%s desc NULLS LAST", field)
+	}
+	return fmt.Sprintf("%s asc NULLS FIRST", field)
 }

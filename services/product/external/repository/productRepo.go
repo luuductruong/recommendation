@@ -7,9 +7,10 @@ import (
 )
 
 type product struct {
-	ProductID int64 `gorm:"primary_key"`
-	Name      string
-	Price     float64
+	ProductID  int64 `gorm:"primary_key"`
+	Name       string
+	Price      float64
+	CategoryID string
 }
 
 func mapProductToDm(source *product) *productDm.Product {
@@ -17,9 +18,10 @@ func mapProductToDm(source *product) *productDm.Product {
 		return nil
 	}
 	return &productDm.Product{
-		ProductID: source.ProductID,
-		Name:      source.Name,
-		Price:     source.Price,
+		ProductID:  source.ProductID,
+		Name:       source.Name,
+		Price:      source.Price,
+		CategoryID: source.CategoryID,
 	}
 }
 

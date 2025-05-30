@@ -17,8 +17,9 @@ message GetProductDetailResp {
 
 message GetRecommendationForUserReq {
   string user_id = 1; // TODO change to header
+  int32 limit = 2;
 }
 
 message GetRecommendationForUserResp {
-  repeated model.Product list_product = 1;
+  repeated int64 product_ids = 1;
 }

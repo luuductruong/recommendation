@@ -97,16 +97,21 @@
         "user_id": {
           "type": "string",
           "title": "TODO change to header"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
     "dtoGetRecommendationForUserResp": {
       "type": "object",
       "properties": {
-        "list_product": {
+        "product_ids": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/modelProduct"
+            "type": "string",
+            "format": "int64"
           }
         }
       }
@@ -124,6 +129,9 @@
         "price": {
           "type": "number",
           "format": "double"
+        },
+        "category_id": {
+          "type": "string"
         }
       }
     }

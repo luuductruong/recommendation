@@ -6,20 +6,12 @@ import (
 	"time"
 )
 
-func MapList[S any, D any](source []*S, mapper func(*S) *D) []*D {
-	return Mapper(source, func(t *S, _ int) *D {
-		return mapper(t)
-	})
-}
-
-func Mapper[T any, R any](collection []T, iteratee func(T, int) R) []R {
-	result := make([]R, len(collection))
-
-	for i, item := range collection {
-		result[i] = iteratee(item, i)
+func MapList[S any, D any](source []S, mapper func(S) D) []D {
+	rs := make([]D, len(source))
+	for i := range source {
+		rs[i] = mapper(source[i])
 	}
-
-	return result
+	return rs
 }
 
 func RandString(n int) string {
@@ -36,4 +28,17 @@ func RandString(n int) string {
 
 func NewStringUUID() string {
 	return uuid.New().String()
+}
+
+// Unique ...
+func Unique[T comparable](arr []T) []T {
+	u := make([]T, 0)
+	m := make(map[T]bool)
+	for _, val := range arr {
+		if _, ok := m[val]; !ok {
+			m[val] = true
+			u = append(u, val)
+		}
+	}
+	return u
 }

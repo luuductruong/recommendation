@@ -33,3 +33,17 @@ func (h *handler) GetProductDetail(ctx context.Context, req *dto.GetProductDetai
 		Product: dto.MapProductFromDm(prod),
 	}, nil
 }
+
+func (h *handler) GetRecommendationForUser(ctx context.Context, req *dto.GetRecommendationForUserReq) (*dto.GetRecommendationForUserResp, error) {
+	appCtx := appContext.FromContext(ctx)
+	productIds, err := h.productDomain.GetRecommendationForUser(appCtx, &product.GetRecommendationForUserInp{
+		UserID: req.UserId,
+		Limit:  req.Limit,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &dto.GetRecommendationForUserResp{
+		ProductIds: productIds,
+	}, nil
+}

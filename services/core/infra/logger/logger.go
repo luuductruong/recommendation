@@ -25,11 +25,11 @@ const (
 
 // Config of logger
 type Config struct {
-	Output        string
-	File          string
-	Level         string
-	Format        string
-	ExpectingLine bool
+	Output        string `config:"output"`
+	File          string `config:"file"`
+	Level         string `config:"level"`
+	Format        string `config:"format"`
+	ExpectingLine bool   `config:"expecting_line"`
 }
 
 var Default Logger
