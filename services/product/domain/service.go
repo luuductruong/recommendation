@@ -6,20 +6,20 @@ import (
 )
 
 type ProductDomainParam struct {
-	ProductRepo     product.ProductRepo
-	ProductViewRepo product.ProductViewRepo
+	ProductRepo         product.ProductRepo
+	UserViewHistoryRepo product.UserViewHistoryRepo
 }
 
 type domain struct {
 	logger          logger.Logger
 	productRepo     product.ProductRepo
-	productViewRepo product.ProductViewRepo
+	userViewHistory product.UserViewHistoryRepo
 }
 
 func NewDomain(param *ProductDomainParam) product.Service {
 	return &domain{
 		logger:          logger.Default,
 		productRepo:     param.ProductRepo,
-		productViewRepo: param.ProductViewRepo,
+		userViewHistory: param.UserViewHistoryRepo,
 	}
 }

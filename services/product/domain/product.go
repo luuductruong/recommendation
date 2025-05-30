@@ -36,7 +36,7 @@ func (d *domain) updateUserViewHistory(ctx context.Context, userID string, prod 
 	}
 	d.logger.DebugCtx(ctx, "updateUserViewHistory with prod:", prod)
 	// query by user_id, product_id
-	existView, err := d.productViewRepo.Query(ctx).
+	existView, err := d.userViewHistory.Query(ctx).
 		ByUserID(userID).
 		ByProductID(prod.ProductID).
 		Result()
@@ -48,20 +48,20 @@ func (d *domain) updateUserViewHistory(ctx context.Context, userID string, prod 
 		d.logger.DebugCtx(ctx, "updateUserViewHistory with exist view:", existView)
 		//update
 		existView.ViewAt = time.Now()
-		err = d.productViewRepo.Upsert(ctx, existView)
+		err = d.userViewHistory.Upsert(ctx, existView)
 		if err != nil {
 			d.logger.ErrorCtx(ctx, err, "Error upserting product view")
 		}
 		return
 	}
 	d.logger.DebugCtx(ctx, "updateUserViewHistory with nil view")
-	newView := &product.ProductView{
+	newView := &product.UserViewHistory{
 		ID:        helper.NewStringUUID(),
 		ViewAt:    time.Now(),
 		ProductID: prod.ProductID,
 		UserID:    userID,
 	}
-	err = d.productViewRepo.Upsert(ctx, newView)
+	err = d.userViewHistory.Upsert(ctx, newView)
 	if err != nil {
 		d.logger.ErrorCtx(ctx, err, "Error upserting product view")
 	}

@@ -9,7 +9,7 @@ type Product struct {
 	// add more fields here
 }
 
-type ProductView struct {
+type UserViewHistory struct {
 	ID        string
 	UserID    string
 	ProductID int64

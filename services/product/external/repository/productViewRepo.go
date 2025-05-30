@@ -7,29 +7,29 @@ import (
 	"time"
 )
 
-type productView struct {
+type userViewHistory struct {
 	ID        string
 	UserID    string
 	ProductID int64
 	ViewAt    time.Time
 }
 
-func mapProductViewToDm(source *productView) *productDm.ProductView {
+func mapUserViewHistoryToDm(source *userViewHistory) *productDm.UserViewHistory {
 	if source == nil {
 		return nil
 	}
-	return &productDm.ProductView{
+	return &productDm.UserViewHistory{
 		ID:        source.ID,
 		UserID:    source.UserID,
 		ProductID: source.ProductID,
 		ViewAt:    source.ViewAt,
 	}
 }
-func mapProductViewFromDm(source *productDm.ProductView) *productView {
+func mapUserViewHistoryFromDm(source *productDm.UserViewHistory) *userViewHistory {
 	if source == nil {
 		return nil
 	}
-	return &productView{
+	return &userViewHistory{
 		ID:        source.ID,
 		UserID:    source.UserID,
 		ProductID: source.ProductID,
@@ -37,41 +37,41 @@ func mapProductViewFromDm(source *productDm.ProductView) *productView {
 	}
 }
 
-func (v productView) TableName() string {
-	return "product_view"
+func (u userViewHistory) TableName() string {
+	return "user_view_history"
 }
 
-func NewProductViewRepo() productDm.ProductViewRepo {
-	return &productViewRepo{}
+func NewUserViewHistoryRepo() productDm.UserViewHistoryRepo {
+	return &userViewHistoryRepo{}
 }
 
-type productViewRepo struct {
+type userViewHistoryRepo struct {
 }
 
-func (v *productViewRepo) Upsert(ctx context.Context, view *productDm.ProductView) error {
-	return query.Upsert(ctx.GetDbTx(), view, mapProductViewFromDm)
+func (u *userViewHistoryRepo) Upsert(ctx context.Context, view *productDm.UserViewHistory) error {
+	return query.Upsert(ctx.GetDbTx(), view, mapUserViewHistoryFromDm)
 }
 
-type productViewQuery struct {
+type userViewHistoryQuery struct {
 	query.BaseQuery
 }
 
-func (v *productViewRepo) Query(ctx context.Context) productDm.ProductViewQuery {
-	return &productViewQuery{query.NewBQ(ctx.GetDbTx().Model(&productView{}))}
+func (u *userViewHistoryRepo) Query(ctx context.Context) productDm.UserViewHistoryQuery {
+	return &userViewHistoryQuery{query.NewBQ(ctx.GetDbTx().Model(&userViewHistory{}))}
 }
 
-func (v *productViewQuery) ByProductID(productID int64) productDm.ProductViewQuery {
-	return query.Where(v, "product_id = ?", productID)
+func (u *userViewHistoryQuery) ByProductID(productID int64) productDm.UserViewHistoryQuery {
+	return query.Where(u, "product_id = ?", productID)
 }
 
-func (v *productViewQuery) ByUserID(userID string) productDm.ProductViewQuery {
-	return query.Where(v, "user_id = ?", userID)
+func (u *userViewHistoryQuery) ByUserID(userID string) productDm.UserViewHistoryQuery {
+	return query.Where(u, "user_id = ?", userID)
 }
 
-func (v *productViewQuery) Result() (*productDm.ProductView, error) {
-	return query.Result(v, mapProductViewToDm)
+func (u *userViewHistoryQuery) Result() (*productDm.UserViewHistory, error) {
+	return query.Result(u, mapUserViewHistoryToDm)
 }
 
-func (v *productViewQuery) ResultList() ([]*productDm.ProductView, error) {
-	return query.ResultList(v, mapProductViewToDm)
+func (u *userViewHistoryQuery) ResultList() ([]*productDm.UserViewHistory, error) {
+	return query.ResultList(u, mapUserViewHistoryToDm)
 }

@@ -14,18 +14,18 @@ type ProductQuery interface {
 	ResultList() ([]*Product, error)
 }
 
-type ProductViewRepo interface {
+type UserViewHistoryRepo interface {
 	// input
-	Upsert(ctx context.Context, product *ProductView) error
+	Upsert(ctx context.Context, product *UserViewHistory) error
 	// query
-	Query(ctx context.Context) ProductViewQuery
+	Query(ctx context.Context) UserViewHistoryQuery
 }
 
-type ProductViewQuery interface {
+type UserViewHistoryQuery interface {
 	// query
-	ByProductID(productID int64) ProductViewQuery
-	ByUserID(userID string) ProductViewQuery
+	ByProductID(productID int64) UserViewHistoryQuery
+	ByUserID(userID string) UserViewHistoryQuery
 	// result
-	Result() (*ProductView, error)
-	ResultList() ([]*ProductView, error)
+	Result() (*UserViewHistory, error)
+	ResultList() ([]*UserViewHistory, error)
 }

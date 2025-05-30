@@ -37,8 +37,8 @@ func Run() {
 	}
 
 	productDomain := domain.NewDomain(&domain.ProductDomainParam{
-		ProductRepo:     repo.NewProductRepo(),
-		ProductViewRepo: repo.NewProductViewRepo(),
+		ProductRepo:         repo.NewProductRepo(),
+		UserViewHistoryRepo: repo.NewUserViewHistoryRepo(),
 	})
 	grpcHandler = handler.NewHandler(productDomain)
 
