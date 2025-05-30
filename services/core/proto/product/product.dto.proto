@@ -6,11 +6,19 @@ import "product/product.model.proto";
 
 package dto;
 
-message ViewProductReq {
+message GetProductDetailReq {
   string user_id = 1; // TODO change user_id to header, detect from bearer token
-  repeated int32 product_ids = 2;
+  int64 product_id = 2;
 }
 
-message ViewProductResp {
+message GetProductDetailResp {
+  model.Product product = 1;
+}
+
+message GetRecommendationForUserReq {
+  string user_id = 1; // TODO change to header
+}
+
+message GetRecommendationForUserResp {
   repeated model.Product list_product = 1;
 }

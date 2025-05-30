@@ -23,7 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProductServiceClient interface {
-	ViewProduct(ctx context.Context, in *dto.ViewProductReq, opts ...grpc.CallOption) (*dto.ViewProductResp, error)
+	GetProductDetail(ctx context.Context, in *dto.GetProductDetailReq, opts ...grpc.CallOption) (*dto.GetProductDetailResp, error)
+	GetRecommendationForUser(ctx context.Context, in *dto.GetRecommendationForUserReq, opts ...grpc.CallOption) (*dto.GetRecommendationForUserResp, error)
 }
 
 type productServiceClient struct {
@@ -34,9 +35,18 @@ func NewProductServiceClient(cc grpc.ClientConnInterface) ProductServiceClient {
 	return &productServiceClient{cc}
 }
 
-func (c *productServiceClient) ViewProduct(ctx context.Context, in *dto.ViewProductReq, opts ...grpc.CallOption) (*dto.ViewProductResp, error) {
-	out := new(dto.ViewProductResp)
-	err := c.cc.Invoke(ctx, "/service.ProductService/ViewProduct", in, out, opts...)
+func (c *productServiceClient) GetProductDetail(ctx context.Context, in *dto.GetProductDetailReq, opts ...grpc.CallOption) (*dto.GetProductDetailResp, error) {
+	out := new(dto.GetProductDetailResp)
+	err := c.cc.Invoke(ctx, "/service.ProductService/GetProductDetail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) GetRecommendationForUser(ctx context.Context, in *dto.GetRecommendationForUserReq, opts ...grpc.CallOption) (*dto.GetRecommendationForUserResp, error) {
+	out := new(dto.GetRecommendationForUserResp)
+	err := c.cc.Invoke(ctx, "/service.ProductService/GetRecommendationForUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +57,8 @@ func (c *productServiceClient) ViewProduct(ctx context.Context, in *dto.ViewProd
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility
 type ProductServiceServer interface {
-	ViewProduct(context.Context, *dto.ViewProductReq) (*dto.ViewProductResp, error)
+	GetProductDetail(context.Context, *dto.GetProductDetailReq) (*dto.GetProductDetailResp, error)
+	GetRecommendationForUser(context.Context, *dto.GetRecommendationForUserReq) (*dto.GetRecommendationForUserResp, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -55,8 +66,11 @@ type ProductServiceServer interface {
 type UnimplementedProductServiceServer struct {
 }
 
-func (UnimplementedProductServiceServer) ViewProduct(context.Context, *dto.ViewProductReq) (*dto.ViewProductResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ViewProduct not implemented")
+func (UnimplementedProductServiceServer) GetProductDetail(context.Context, *dto.GetProductDetailReq) (*dto.GetProductDetailResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductDetail not implemented")
+}
+func (UnimplementedProductServiceServer) GetRecommendationForUser(context.Context, *dto.GetRecommendationForUserReq) (*dto.GetRecommendationForUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecommendationForUser not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 
@@ -71,20 +85,38 @@ func RegisterProductServiceServer(s grpc.ServiceRegistrar, srv ProductServiceSer
 	s.RegisterService(&ProductService_ServiceDesc, srv)
 }
 
-func _ProductService_ViewProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(dto.ViewProductReq)
+func _ProductService_GetProductDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(dto.GetProductDetailReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProductServiceServer).ViewProduct(ctx, in)
+		return srv.(ProductServiceServer).GetProductDetail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/service.ProductService/ViewProduct",
+		FullMethod: "/service.ProductService/GetProductDetail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProductServiceServer).ViewProduct(ctx, req.(*dto.ViewProductReq))
+		return srv.(ProductServiceServer).GetProductDetail(ctx, req.(*dto.GetProductDetailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_GetRecommendationForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(dto.GetRecommendationForUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).GetRecommendationForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/service.ProductService/GetRecommendationForUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).GetRecommendationForUser(ctx, req.(*dto.GetRecommendationForUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -97,8 +129,12 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ProductServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ViewProduct",
-			Handler:    _ProductService_ViewProduct_Handler,
+			MethodName: "GetProductDetail",
+			Handler:    _ProductService_GetProductDetail_Handler,
+		},
+		{
+			MethodName: "GetRecommendationForUser",
+			Handler:    _ProductService_GetRecommendationForUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

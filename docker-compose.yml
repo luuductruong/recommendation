@@ -10,3 +10,18 @@ services:
       - ./:/go/src/
     working_dir: /go/src/
     command: 'make proto'
+  recommendation_postgres:
+    image: postgres:15
+    container_name: recommendation_postgres
+    restart: always
+    ports:
+      - "15432:5432" # do 5432 bị chiếm bởi project khác (local)
+    environment:
+      POSTGRES_USER: recommendation
+      POSTGRES_PASSWORD: recommendation
+      POSTGRES_DB: recommendation
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: # lưu dữ liệu khi chạy docker compose down

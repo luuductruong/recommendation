@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/product/list": {
+    "/v1/product/user/recommendation": {
       "post": {
-        "operationId": "ProductService_ViewProduct",
+        "operationId": "ProductService_GetRecommendationForUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/dtoViewProductResp"
+              "$ref": "#/definitions/dtoGetRecommendationForUserResp"
             }
           }
         },
@@ -33,7 +33,46 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/dtoViewProductReq"
+              "$ref": "#/definitions/dtoGetRecommendationForUserReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
+    "/v1/product/{product_id}/detail": {
+      "post": {
+        "operationId": "ProductService_GetProductDetail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dtoGetProductDetailResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "title": "TODO change user_id to header, detect from bearer token"
+                }
+              }
             }
           }
         ],
@@ -44,23 +83,24 @@
     }
   },
   "definitions": {
-    "dtoViewProductReq": {
+    "dtoGetProductDetailResp": {
+      "type": "object",
+      "properties": {
+        "product": {
+          "$ref": "#/definitions/modelProduct"
+        }
+      }
+    },
+    "dtoGetRecommendationForUserReq": {
       "type": "object",
       "properties": {
         "user_id": {
           "type": "string",
-          "title": "TODO change user_id to header, detect from bearer token"
-        },
-        "product_ids": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int32"
-          }
+          "title": "TODO change to header"
         }
       }
     },
-    "dtoViewProductResp": {
+    "dtoGetRecommendationForUserResp": {
       "type": "object",
       "properties": {
         "list_product": {

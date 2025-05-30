@@ -2,16 +2,22 @@ syntax = "proto3";
 
 package service;
 
-option go_package = "github.com/recommendation/service/core/application/product/service";
+option go_package = "github.com/recommendation/services/core/application/product/service";
 
 import "product/product.dto.proto";
 import "google/api/annotations.proto";
 
 
 service ProductService {
-  rpc ViewProduct(dto.ViewProductReq) returns (dto.ViewProductResp) {
+  rpc GetProductDetail(dto.GetProductDetailReq) returns (dto.GetProductDetailResp) {
     option (google.api.http) = {
-      post: "/v1/product/list"
+      post: "/v1/product/{product_id}/detail"
+      body: "*"
+    };
+  }
+  rpc GetRecommendationForUser(dto.GetRecommendationForUserReq) returns (dto.GetRecommendationForUserResp){
+    option (google.api.http) = {
+      post: "/v1/product/user/recommendation" // TODO change method to GET, detect user_id from header
       body: "*"
     };
   }
