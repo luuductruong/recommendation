@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "github.com/recommendation/services/core/application/product/dto";
+
+import "product/product.model.proto";
+
+package dto;
+
+message ViewProductReq {
+  string user_id = 1; // TODO change user_id to header, detect from bearer token
+  repeated int32 product_ids = 2;
+}
+
+message ViewProductResp {
+  repeated model.Product list_product = 1;
+}

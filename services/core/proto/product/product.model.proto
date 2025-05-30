@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = "github.com/recommendation/services/core/application/product/model";
+
+package model;
+
+message Product {
+  int64 id = 1;
+  string name = 2;
+  double price = 3;
+}

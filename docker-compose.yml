@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  recommendation_proto_builder:
+    build:
+      context: ./
+      dockerfile: ./docker-compose/proto/Dockerfile
+    container_name: recommendation_proto_builder
+    volumes:
+      - ./:/go/src/
+    working_dir: /go/src/
+    command: 'make proto'

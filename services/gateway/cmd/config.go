@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	cfn "github.com/recommentation/service/core/infra/config"
+	cfn "github.com/recommendation/services/core/infra/config"
 )
 
 type Config struct {

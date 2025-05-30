@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package service;
+
+option go_package = "github.com/recommendation/service/core/application/product/service";
+
+import "product/product.dto.proto";
+import "google/api/annotations.proto";
+
+
+service ProductService {
+  rpc ViewProduct(dto.ViewProductReq) returns (dto.ViewProductResp) {
+    option (google.api.http) = {
+      post: "/v1/product/list"
+      body: "*"
+    };
+  }
+}
