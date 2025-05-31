@@ -1,4 +1,4 @@
--- Postgres
+-- PostgreSQL 15.13 (Debian 15.13-1.pgdg120+1)
 DO
 $$
     DECLARE
@@ -9,11 +9,11 @@ $$
         uid          TEXT;
         cid          TEXT;
 BEGIN
-    -- Đếm số sản phẩm. Do tạo id tăng dần, nên có thể đếm số lượng để biết id đang tới bao nhiêu
+    -- Counting product_id in simple
     SELECT COUNT(*) INTO existing_product_count FROM product;
-        -- Tạo sản phẩm
-    IF existing_product_count+1 < num_product THEN
-        FOR i IN existing_product_count..num_product
+        -- Create product if count<num
+    IF existing_product_count < num_product THEN
+        FOR i IN existing_product_count+1..num_product
             LOOP cid := category_ids[(trunc(random() * array_length(category_ids, 1)) + 1)::int];
                 INSERT INTO product (product_id, name, price, category_id)
                 VALUES (i,
@@ -23,18 +23,18 @@ BEGIN
             END LOOP;
     END IF;
 
-    -- Tạo lịch sử xem sản phẩm
+    -- Create view history
     FOR i IN 1..100
         LOOP uid := user_ids[(trunc(random() * array_length(user_ids, 1)) + 1)::int];
             INSERT INTO user_view_history (id, product_id, user_id, view_at)
-            VALUES (gen_random_uuid(),
+            VALUES (gen_random_uuid(), -- For postgres version >= 13. Older version (>=8.3) use uuid_generate_v4() instead
                     (random() * num_product)::int + 1,
                     uid,
-                    NOW() - (INTERVAL '3 minutes 5 seconds' * ((random() * 10)::int + 1)));
+                    NOW() - (INTERVAL '1 minutes 26 seconds' * ((random() * 10)::int + 1)));
 
-            -- Ngủ 0.091 giây sau mỗi 10 insert
-            IF i % 10 = 0 THEN
-                PERFORM pg_sleep(0.091);
+            -- Sleep for a while cuz I don't want to see the same time
+            IF i % 8 = 0 THEN
+                PERFORM pg_sleep(0.261);
             END IF;
         END LOOP;
 END;
