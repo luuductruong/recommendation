@@ -17,7 +17,7 @@ service ProductService {
   }
   rpc GetRecommendationForUser(dto.GetRecommendationForUserReq) returns (dto.GetRecommendationForUserResp){
     option (google.api.http) = {
-      post: "/v1/product/user/recommendation" // TODO change method to GET, detect user_id from header
+      post: "/v1/product/user/recommendation" // TODO change detect user_id from header
       body: "*"
     };
   }
