@@ -34,11 +34,25 @@ $$
         view_time    TIMESTAMP;
         cat_id       TEXT;
         num_product  INT := 10;
+        def_pid      INT;
+        def_cat_id   TEXT;
     BEGIN
+        SELECT product_id, category_id INTO def_pid, def_cat_id FROM product WHERE product_id > 0 ORDER BY product_id desc LIMIT 1;
+        IF NOT FOUND THEN
+            -- product don't have data
+            RETURN ;
+        END IF;
         FOR i IN 1..100 LOOP
                 uid := user_ids[(trunc(random() * array_length(user_ids, 1)) + 1)::int];
                 pid := (random() * num_product)::int + 1;
                 view_time := NOW() - (INTERVAL '1 minutes 26 seconds' * ((random() * 10)::int + 1));
+
+                -- get category_id from product
+                SELECT category_id INTO cat_id FROM product WHERE product_id = pid;
+                IF NOT FOUND THEN
+                    pid = def_pid;
+                    cat_id = def_cat_id;
+                END IF;
 
                 -- Insert view history
                 INSERT INTO user_view_history (id, product_id, user_id, view_at)
@@ -48,9 +62,6 @@ $$
                            uid,
                            view_time
                        );
-
-                -- get category_id from product
-                SELECT category_id INTO cat_id FROM product WHERE product_id = pid;
 
                 -- insert / update category_view_history
                 INSERT INTO category_view_history (id, category_id, total_view, last_view_at)
