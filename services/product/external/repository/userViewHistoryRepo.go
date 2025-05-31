@@ -139,12 +139,23 @@ func (u *userViewHistoryRepo) GetMostViewedProductsInCategory(ctx context.Contex
 		ORDER BY view_count DESC
 		LIMIT $3;`, u.TableName)
 
-	query := ctx.GetDbTx().Raw(sql, categoryID, excludeProductID, limit)
-	err := query.Find(&result).Error
+	q := ctx.GetDbTx().Raw(sql, categoryID, excludeProductID, limit)
+	err := q.Find(&result).Error
 	if err != nil {
 		return nil, err
 	}
 	return helper.MapList(result, mapSummaryProductViewToDm), nil
+}
+
+func (u *userViewHistoryRepo) UsersWhoViewedProduct(ctx context.Context, productID int64, excludeUserID string) ([]string, error) {
+	var userIDs []string
+	sql := fmt.Sprintf(`SELECT DISTINCT user_id FROM %s WHERE product_id = $1 AND user_id != $2`, u.TableName)
+	q := ctx.GetDbTx().Raw(sql, productID, excludeUserID)
+	err := q.Find(&userIDs).Error
+	if err != nil {
+		return nil, err
+	}
+	return userIDs, nil
 }
 
 func (u *userViewHistoryRepo) Upsert(ctx context.Context, view *productDm.UserViewHistory) error {

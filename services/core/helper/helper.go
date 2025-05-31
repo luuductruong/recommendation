@@ -3,6 +3,7 @@ package helper
 import (
 	"github.com/google/uuid"
 	"math/rand"
+	"sort"
 	"time"
 )
 
@@ -49,6 +50,18 @@ func SelectMap[T any](src []T, mapper func(T) bool) []T {
 		if mapper(v) {
 			res = append(res, v)
 		}
+	}
+	return res
+}
+
+// Sort clone T to T_after_sorting
+func Sort[T any](src []T, less func(i, j int) bool) []T {
+	res := make([]T, 0)
+	sort.Slice(src, func(i, j int) bool {
+		return less(i, j)
+	})
+	for _, v := range src {
+		res = append(res, v)
 	}
 	return res
 }

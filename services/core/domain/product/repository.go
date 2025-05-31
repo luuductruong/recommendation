@@ -27,10 +27,12 @@ type UserViewHistoryRepo interface {
 	MostViewedInTimeRange(ctx context.Context, viewFrom, viewTo time.Time, limit int32) ([]*SummaryProductView, error)
 	// get product_ids have the most viewed. Return product_id and view_count
 	MostView(ctx context.Context, limit int32) ([]*SummaryProductView, error)
-	// get product_ids viewed by user
+	// get product_ids viewed by user. Return product_id and view_time
 	RecentViewProductsByUser(ctx context.Context, userID string, limit int32) ([]*SummaryProductView, error)
-	// get product_ids viewed by user
-	GetMostViewedProductsInCategory(ctx context.Context, categoryID string, pickedProductID int64, limit int32) ([]*SummaryProductView, error)
+	// get similar category with product_id. Return product_id and view_count
+	GetMostViewedProductsInCategory(ctx context.Context, categoryID string, excludeProductID int64, limit int32) ([]*SummaryProductView, error)
+	// get user also viewed product, exclude userID
+	UsersWhoViewedProduct(ctx context.Context, productID int64, excludeUserID string) ([]string, error)
 }
 
 type UserViewHistoryQuery interface {

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"time"
 
 	"github.com/recommendation/services/core/context"
@@ -25,41 +26,10 @@ func (d *domain) GetRecommendationForUser(ctx context.Context, inp *product.GetR
 	if queryLimit <= 0 {
 		queryLimit = DefaultRecommendationNumber
 	}
-	recentView, err := d.userViewHistory.RecentViewProductsByUser(ctx, inp.UserID, queryLimit)
-	if err != nil {
-		d.logger.DebugCtx(ctx, "RecentViewProductsByUser query error:", err)
-		return nil, err
+	if inp.ProductID > 0 {
+		return d.GetRelatedProducts(ctx, inp.ProductID, queryLimit)
 	}
-	if int32(len(recentView)) == queryLimit { // never len(productIds) > inp.Limit
-		return recentView, nil
-	}
-	popular, _ := d.GetPopularProducts(ctx, queryLimit) // ignore error
-	if len(popular) == 0 {
-		d.logger.DebugCtx(ctx, "GetPopularProducts query error:", err)
-		return recentView, nil
-	}
-	// merge response
-	recentView = append(recentView, popular...)
-	resp := helper.UniqBy(recentView, func(s *product.SummaryProductView) int64 {
-		return s.ProductID
-	})
-	if len(resp) == 0 { // Edge case not found any history
-		prods, _ := d.productRepo.Query(ctx).Limit(int(inp.Limit)).ResultList()
-		if len(prods) == 0 {
-			return nil, nil
-		}
-		for _, prod := range prods {
-			resp = append(resp, &product.SummaryProductView{
-				ProductID: prod.ProductID,
-				ViewCount: helper.AnyToPointer(int64(0)),
-				ViewAt:    helper.AnyToPointer(time.Now()),
-			})
-		}
-	}
-	if int32(len(resp)) > inp.Limit {
-		resp = resp[:inp.Limit]
-	}
-	return resp, nil
+	return d.GetCollaborativeRecommendation(ctx, inp.UserID, queryLimit)
 }
 
 /*
@@ -69,8 +39,8 @@ GetPopularProducts get products with most view
 */
 func (d *domain) GetPopularProducts(ctx context.Context, limit int32) ([]*product.SummaryProductView, error) {
 	d.logger.DebugCtx(ctx, "GetPopularProducts with limit:", limit)
-	to := time.Now()
-	from := to.AddDate(0, 0, -2) // default in 2 days, maybe change later
+	to := time.Now().UTC()
+	from := to.AddDate(0, -1, 0).UTC() // default in 1 month, maybe change later
 	res, err := d.userViewHistory.MostViewedInTimeRange(ctx, from, to, limit)
 	if err != nil {
 		d.logger.ErrorCtx(ctx, err)
@@ -102,7 +72,7 @@ func (d *domain) GetPopularProducts(ctx context.Context, limit int32) ([]*produc
 GetRelatedProducts
   - get
 */
-func (d *domain) GetRelatedProducts(ctx context.Context, productID int64, limit int32) ([]int64, error) {
+func (d *domain) GetRelatedProducts(ctx context.Context, productID int64, limit int32) ([]*product.SummaryProductView, error) {
 	d.logger.DebugCtx(ctx, "GetRelatedProducts with productID:", productID)
 	if productID <= 0 {
 		return nil, nil
@@ -120,9 +90,88 @@ func (d *domain) GetRelatedProducts(ctx context.Context, productID int64, limit 
 		d.logger.ErrorCtx(ctx, err)
 		return nil, err
 	}
-	relatedProducts := []int64{}
-	for _, v := range viewHistory {
-		relatedProducts = append(relatedProducts, v.ProductID)
+	if len(viewHistory) == 0 {
+		viewHistory, err = d.GetPopularProducts(ctx, limit)
+		if err != nil {
+			d.logger.ErrorCtx(ctx, err)
+			return nil, err
+		}
 	}
-	return relatedProducts, nil
+	return viewHistory, nil
+}
+
+/*
+GetCollaborativeRecommendation recommend products based on other users' view history who viewed the same products as current user
+  - Get products user viewed recently
+  - For each product, find other users who viewed it (excluding current user)
+  - Aggregate products viewed by these other users
+  - Sort aggregated products by count desc
+*/
+func (d *domain) GetCollaborativeRecommendation(ctx context.Context, userID string, limit int32) ([]*product.SummaryProductView, error) {
+	d.logger.DebugCtx(ctx, "GetCollaborativeRecommendation with userID:", userID)
+	if userID == "" {
+		return nil, errors.New("userID is empty")
+	}
+
+	// Step 1: Get products user viewed recently
+	userViewed, err := d.userViewHistory.RecentViewProductsByUser(ctx, userID, limit)
+	if err != nil {
+		d.logger.ErrorCtx(ctx, err)
+		return nil, err
+	}
+	if len(userViewed) == 0 {
+		// fallback popular products
+		d.logger.DebugCtx(ctx, "recent view products is empty, returning popular recommendations")
+		return d.GetPopularProducts(ctx, limit)
+	}
+
+	// Step 2: For each product, find other users who viewed it (excluding current user)
+	otherUsers := make(map[string]struct{})
+	for _, prod := range userViewed {
+		users, err := d.userViewHistory.UsersWhoViewedProduct(ctx, prod.ProductID, userID)
+		if err != nil {
+			d.logger.ErrorCtx(ctx, err)
+			continue
+		}
+		for _, u := range users {
+			otherUsers[u] = struct{}{}
+		}
+	}
+
+	if len(otherUsers) == 0 {
+		// no similar users, fallback popular
+		d.logger.DebugCtx(ctx, "no other users found, returning popular recommendations")
+		return d.GetPopularProducts(ctx, limit)
+	}
+
+	// Step 3: Aggregate products viewed by these other users
+	aggProductViews := make(map[int64]int64) // productID -> count
+	for u := range otherUsers {
+		views, err := d.userViewHistory.RecentViewProductsByUser(ctx, u, 20)
+		if err != nil {
+			d.logger.ErrorCtx(ctx, err)
+			continue
+		}
+		for _, v := range views {
+			aggProductViews[v.ProductID] += 1
+		}
+	}
+
+	resp := make([]*product.SummaryProductView, 0)
+	for prodID, count := range aggProductViews {
+		resp = append(resp, &product.SummaryProductView{
+			ProductID: prodID,
+			ViewCount: helper.AnyToPointer(count),
+		})
+	}
+	if len(resp) == 0 {
+		// fallback popular products
+		return d.GetPopularProducts(ctx, limit)
+	}
+
+	// Step 5: Sort aggregated products by count desc
+	resp = helper.Sort(resp, func(i, j int) bool {
+		return *resp[i].ViewCount > *resp[j].ViewCount // decreasing
+	})
+	return resp, nil
 }
