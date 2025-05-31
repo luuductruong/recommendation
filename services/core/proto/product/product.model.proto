@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/recommendation/services/core/application/product/model";
 
 package model;
@@ -9,4 +11,10 @@ message Product {
   string name = 2;
   double price = 3;
   string category_id = 4;
+}
+
+message ViewStatus {
+  int64 product_id = 1;
+  int64 total_view = 2;
+  google.protobuf.Timestamp last_view = 3;
 }

@@ -83,6 +83,15 @@ func ResultList[S any, D any](bq BaseQuery, mapper func(s *S) *D) ([]*D, error) 
 	return helper.MapList(rs, mapper), nil
 }
 
+func Limit[I any](q I, limit int) I {
+	if limit <= 0 {
+		return q
+	}
+	db := any(q).(BaseQuery)
+	db.SetDB(db.GetDB().Limit(limit))
+	return q
+}
+
 func getOrderByStr(field string, desc bool) string {
 	if desc {
 		return fmt.Sprintf("%s desc NULLS LAST", field)

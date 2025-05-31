@@ -6,6 +6,7 @@ type GetProductDetailInp struct {
 }
 
 type GetRecommendationForUserInp struct {
-	UserID string
-	Limit  int32
+	UserID    string
+	ProductID int64
+	Limit     int32
 }

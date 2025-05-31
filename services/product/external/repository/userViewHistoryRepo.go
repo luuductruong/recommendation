@@ -18,8 +18,8 @@ type userViewHistory struct {
 
 type summaryProductView struct {
 	ProductID int64
-	ViewCount int64
-	ViewAt    time.Time
+	ViewCount *int64
+	ViewAt    *time.Time
 }
 
 func mapSummaryProductViewToDm(source *summaryProductView) *productDm.SummaryProductView {
@@ -70,7 +70,7 @@ type userViewHistoryRepo struct {
 	TableName string
 }
 
-func (u *userViewHistoryRepo) MostPopularProductsInTimeRange(ctx context.Context, viewFrom, viewTo time.Time, limit int32) ([]*productDm.SummaryProductView, error) {
+func (u *userViewHistoryRepo) MostViewedInTimeRange(ctx context.Context, viewFrom, viewTo time.Time, limit int32) ([]*productDm.SummaryProductView, error) {
 	var result []*summaryProductView
 	sql := fmt.Sprintf(`SELECT *
 			FROM (
@@ -106,6 +106,41 @@ LIMIT $2`, u.TableName)
 
 	q := ctx.GetDbTx().Raw(sql, userID, limit)
 	err := q.Find(&result).Error
+	if err != nil {
+		return nil, err
+	}
+	return helper.MapList(result, mapSummaryProductViewToDm), nil
+}
+
+func (u *userViewHistoryRepo) MostView(ctx context.Context, limit int32) ([]*productDm.SummaryProductView, error) {
+	var result []*summaryProductView
+	sql := fmt.Sprintf(`SELECT DISTINCT product_id, count(*) as view_count
+								FROM %s
+								GROUP BY product_id
+								ORDER BY view_count desc
+								LIMIT $1;`, u.TableName)
+	q := ctx.GetDbTx().Raw(sql, limit)
+	err := q.Find(&result).Error
+	if err != nil {
+		return nil, err
+	}
+	return helper.MapList(result, mapSummaryProductViewToDm), nil
+}
+
+func (u *userViewHistoryRepo) GetMostViewedProductsInCategory(ctx context.Context, categoryID string, excludeProductID int64, limit int32) ([]*productDm.SummaryProductView, error) {
+	var result []*summaryProductView
+
+	sql := fmt.Sprintf(`
+		SELECT product_id, COUNT(*) AS view_count
+		FROM %s uvh
+		JOIN products p ON uvh.product_id = p.id
+		WHERE p.category = $1 AND uvh.product_id != $2
+		GROUP BY uvh.product_id
+		ORDER BY view_count DESC
+		LIMIT $3;`, u.TableName)
+
+	query := ctx.GetDbTx().Raw(sql, categoryID, excludeProductID, limit)
+	err := query.Find(&result).Error
 	if err != nil {
 		return nil, err
 	}
@@ -152,4 +187,9 @@ func (u *userViewHistoryQuery) ResultList() ([]*productDm.UserViewHistory, error
 // ordering
 func (u *userViewHistoryQuery) OrderByViewedTime(desc bool) productDm.UserViewHistoryQuery {
 	return query.OrderBy(u, "view_at", desc)
+}
+
+// ordering
+func (u *userViewHistoryQuery) Limit(limit int) productDm.UserViewHistoryQuery {
+	return query.Limit(u, limit)
 }

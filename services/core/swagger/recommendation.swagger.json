@@ -101,18 +101,25 @@
         "limit": {
           "type": "integer",
           "format": "int32"
+        },
+        "product_id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
     "dtoGetRecommendationForUserResp": {
       "type": "object",
       "properties": {
-        "product_ids": {
+        "list_viewed": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "int64"
+            "$ref": "#/definitions/modelViewStatus"
           }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -132,6 +139,23 @@
         },
         "category_id": {
           "type": "string"
+        }
+      }
+    },
+    "modelViewStatus": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "total_view": {
+          "type": "string",
+          "format": "int64"
+        },
+        "last_view": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     }

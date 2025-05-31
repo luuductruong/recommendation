@@ -42,3 +42,37 @@ func Unique[T comparable](arr []T) []T {
 	}
 	return u
 }
+
+func SelectMap[T any](src []T, mapper func(T) bool) []T {
+	res := make([]T, 0)
+	for _, v := range src {
+		if mapper(v) {
+			res = append(res, v)
+		}
+	}
+	return res
+}
+
+// AnyToPointer ...
+func AnyToPointer[T any](src T) *T {
+	return &src
+}
+
+// UniqBy ...
+func UniqBy[T any, U comparable](collection []T, iteratee func(T) U) []T {
+	result := make([]T, 0, len(collection))
+	seen := make(map[U]struct{}, len(collection))
+
+	for _, item := range collection {
+		key := iteratee(item)
+
+		if _, ok := seen[key]; ok {
+			continue
+		}
+
+		seen[key] = struct{}{}
+		result = append(result, item)
+	}
+
+	return result
+}

@@ -2,6 +2,7 @@ package grpchandler
 
 import (
 	"context"
+	"github.com/recommendation/services/core/helper"
 
 	"github.com/recommendation/services/core/application/product/dto"
 	"github.com/recommendation/services/core/application/product/service"
@@ -36,14 +37,16 @@ func (h *handler) GetProductDetail(ctx context.Context, req *dto.GetProductDetai
 
 func (h *handler) GetRecommendationForUser(ctx context.Context, req *dto.GetRecommendationForUserReq) (*dto.GetRecommendationForUserResp, error) {
 	appCtx := appContext.FromContext(ctx)
-	productIds, err := h.productDomain.GetRecommendationForUser(appCtx, &product.GetRecommendationForUserInp{
-		UserID: req.UserId,
-		Limit:  req.Limit,
+	recomment, err := h.productDomain.GetRecommendationForUser(appCtx, &product.GetRecommendationForUserInp{
+		UserID:    req.UserId,
+		Limit:     req.Limit,
+		ProductID: req.ProductId,
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &dto.GetRecommendationForUserResp{
-		ProductIds: productIds,
+		ListViewed: helper.MapList(recomment, dto.MapViewStatusFromDm),
+		Total:      int32(len(recomment)),
 	}, nil
 }

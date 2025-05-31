@@ -17,8 +17,15 @@ type UserViewHistory struct {
 	ViewAt    time.Time
 }
 
+type CategoryViewHistory struct {
+	ID         string
+	CategoryID string
+	TotalView  int64
+	LastViewAt time.Time
+}
+
 type SummaryProductView struct {
 	ProductID int64
-	ViewCount int64
-	ViewAt    time.Time
+	ViewCount *int64
+	ViewAt    *time.Time
 }
