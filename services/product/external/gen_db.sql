@@ -25,7 +25,7 @@ create index if not exists idx_user_view_history_user_product_time
     on user_view_history (user_id asc, product_id asc, view_at desc);
 
 -- create category view history
-create table category_view_history
+create table if not exists category_view_history
 (
     id           text not null
         constraint category_view_history_pk
