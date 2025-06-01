@@ -33,6 +33,6 @@
 - **Note:** In practice, I use proper database migrations instead of manually applying raw SQL files. Migrations help maintain consistency and version control across environments.
 
 
-## 3. API's documenting
+## 3. System design
 
-- `services/core/swagger`
+- `SystemDesign.MD`
