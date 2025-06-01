@@ -48,6 +48,10 @@ func (p *productQuery) ByProductID(productID int64) productDm.ProductQuery {
 	return query.Where(p, "product_id = ?", productID)
 }
 
+func (p *productQuery) NotByProductIDs(productIDs ...int64) productDm.ProductQuery {
+	return query.Where(p, "product_id not in ?", productIDs)
+}
+
 func (p *productQuery) Limit(limit int) productDm.ProductQuery {
 	return query.Limit(p, limit)
 }

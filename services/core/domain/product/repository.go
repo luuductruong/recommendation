@@ -12,6 +12,7 @@ type ProductRepo interface {
 type ProductQuery interface {
 	// query
 	ByProductID(productID int64) ProductQuery
+	NotByProductIDs(productIDs ...int64) ProductQuery
 	Limit(limit int) ProductQuery
 	// result
 	Result() (*Product, error)

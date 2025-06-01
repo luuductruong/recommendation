@@ -13,9 +13,9 @@ const DefaultRecommendationNumber = 10
 
 /*
 GetRecommendationForUser return list recomment product_ids for user.
-  - If user didn't get product, return most popular product.
-  - If user have viewed, but not enough limit, append list popular product til fulfill limit.
-  - Edge case: If not found any record in view history, just random products
+  - If not have input, return most popular product
+  - If user view in product_detail (Ex: For product detail screen, we'll recomment related product)
+  - Otherwise, return collaborative product
 */
 func (d *domain) GetRecommendationForUser(ctx context.Context, inp *product.GetRecommendationForUserInp) ([]*product.SummaryProductView, error) {
 	d.logger.DebugCtx(ctx, "inp:", inp)
@@ -34,8 +34,9 @@ func (d *domain) GetRecommendationForUser(ctx context.Context, inp *product.GetR
 
 /*
 GetPopularProducts get products with most view
-  - Get most viewed product in past 2 day (Each product must view as least 5 times)
-  - If not enough limit, merge with list most view product
+  - Get most viewed product in past 1 month (Each product must view as least 5 times)
+  - If not enough limit, merge with list most view product in all the time.
+  - Edge case: Not enough viewed product, combine with random products.
 */
 func (d *domain) GetPopularProducts(ctx context.Context, limit int32) ([]*product.SummaryProductView, error) {
 	d.logger.DebugCtx(ctx, "GetPopularProducts with limit:", limit)
@@ -65,12 +66,32 @@ func (d *domain) GetPopularProducts(ctx context.Context, limit int32) ([]*produc
 			res = res[:limit]
 		}
 	}
+	// if not enough, merge with random others product
+	if int32(len(res)) < limit {
+		existsProductIds := make([]int64, 0)
+		for _, v := range res {
+			existsProductIds = append(existsProductIds, v.ProductID)
+		}
+		prods, err := d.productRepo.Query(ctx).
+			NotByProductIDs(existsProductIds...).
+			Limit(int(limit) - len(existsProductIds)).
+			ResultList()
+		if err != nil {
+			return res, nil
+		}
+		for _, v := range prods {
+			res = append(res, &product.SummaryProductView{
+				ProductID: v.ProductID,
+			})
+		}
+	}
 	return res, nil
 }
 
 /*
 GetRelatedProducts
-  - get
+  - Get most viewed products with same category but not include input product_id
+  - If not found, return list popular product
 */
 func (d *domain) GetRelatedProducts(ctx context.Context, productID int64, limit int32) ([]*product.SummaryProductView, error) {
 	d.logger.DebugCtx(ctx, "GetRelatedProducts with productID:", productID)
@@ -169,7 +190,7 @@ func (d *domain) GetCollaborativeRecommendation(ctx context.Context, userID stri
 		return d.GetPopularProducts(ctx, limit)
 	}
 
-	// Step 5: Sort aggregated products by count desc
+	// Step 4: Sort aggregated products by count desc
 	resp = helper.Sort(resp, func(i, j int) bool {
 		return *resp[i].ViewCount > *resp[j].ViewCount // decreasing
 	})
