@@ -44,10 +44,11 @@ func Unique[T comparable](arr []T) []T {
 	return u
 }
 
-func SelectMap[T any](src []T, mapper func(T) bool) []T {
+// SelectMap copy T into T1, which each must have selectFunc true
+func SelectMap[T any](src []T, selectFunc func(T) bool) []T {
 	res := make([]T, 0)
 	for _, v := range src {
-		if mapper(v) {
+		if selectFunc(v) {
 			res = append(res, v)
 		}
 	}

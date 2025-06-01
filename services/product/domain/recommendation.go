@@ -50,40 +50,33 @@ func (d *domain) GetPopularProducts(ctx context.Context, limit int32) ([]*produc
 	res = helper.SelectMap(res, func(summaryProductView *product.SummaryProductView) bool {
 		return summaryProductView.ViewCount != nil && *summaryProductView.ViewCount > 5 // Example
 	})
-	if int32(len(res)) < limit {
-		// find most viewed products
-		mostView, _ := d.userViewHistory.MostView(ctx, limit)
-		if len(mostView) == 0 {
-			return res, nil
-		}
-		for _, v := range mostView {
-			res = append(res, v)
-		}
-		res = helper.UniqBy(res, func(s *product.SummaryProductView) int64 {
-			return s.ProductID
-		})
-		if int32(len(res)) > limit {
-			res = res[:limit]
-		}
+	if int32(len(res)) >= limit {
+		return res[:limit], nil
+	}
+	// find most viewed products
+	mostView, _ := d.userViewHistory.MostView(ctx, limit)
+	if len(mostView) > 0 {
+		res = append(res, mostView...)
+	}
+	res = helper.UniqBy(res, func(s *product.SummaryProductView) int64 {
+		return s.ProductID
+	})
+	if int32(len(res)) >= limit {
+		return res[:limit], nil
 	}
 	// if not enough, merge with random others product
-	if int32(len(res)) < limit {
-		existsProductIds := make([]int64, 0)
-		for _, v := range res {
-			existsProductIds = append(existsProductIds, v.ProductID)
-		}
-		prods, err := d.productRepo.Query(ctx).
-			NotByProductIDs(existsProductIds...).
-			Limit(int(limit) - len(existsProductIds)).
-			ResultList()
-		if err != nil {
-			return res, nil
-		}
-		for _, v := range prods {
-			res = append(res, &product.SummaryProductView{
-				ProductID: v.ProductID,
-			})
-		}
+	existsProductIds := make([]int64, 0)
+	for _, v := range res {
+		existsProductIds = append(existsProductIds, v.ProductID)
+	}
+	prods, _ := d.productRepo.Query(ctx).
+		NotByProductIDs(existsProductIds...).
+		Limit(int(limit) - len(existsProductIds)).
+		ResultList()
+	for _, v := range prods {
+		res = append(res, &product.SummaryProductView{
+			ProductID: v.ProductID,
+		})
 	}
 	return res, nil
 }
