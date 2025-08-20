@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/recommendation/services/core/infra/logger"
 	"google.golang.org/grpc"
 	"net"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 	productGw "github.com/recommendation/services/core/application/product/service"
 	"github.com/recommendation/services/core/infra/config"
 	grpcHelper "github.com/recommendation/services/core/infra/grpc"
+	"github.com/recommendation/services/core/infra/logger"
 	gatewayMdw "github.com/recommendation/services/gateway/middleware"
 )
 

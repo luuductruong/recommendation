@@ -10,4 +10,6 @@ type Config struct {
 	Grpc     *config.Client `config:"grpc"`
 	Logger   *logger.Config `config:"logger"`
 	DataBase *db.Config     `config:"database"`
+
+	MessageQueue *config.PubSubConfig `config:"message_queue"`
 }

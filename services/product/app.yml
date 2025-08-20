@@ -16,3 +16,23 @@ database:
   password: recommendation
   dbname: recommendation
   ssl: false
+  
+message_queue:
+  kind: rabbitMQ
+  topic: product
+  subscription: product-subscription
+  subscribes:
+    - product.created
+    - product.updated
+    - product.deleted
+  rabbitmq:
+    host: localhost
+    port: 5673
+    username: guest
+    password: guest
+    exchange_name: product
+    topic: product
+    subscribes:
+      - product.created
+      - product.updated
+      - product.deleted

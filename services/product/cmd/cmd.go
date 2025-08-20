@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/recommendation/services/core/infra/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"net"
@@ -11,7 +10,11 @@ import (
 	appService "github.com/recommendation/services/core/application/product/service"
 	"github.com/recommendation/services/core/infra/config"
 	"github.com/recommendation/services/core/infra/db"
+	"github.com/recommendation/services/core/infra/factory"
+	"github.com/recommendation/services/core/infra/logger"
+	"github.com/recommendation/services/core/infra/pubsub"
 	handler "github.com/recommendation/services/product/application/grpchandler"
+	"github.com/recommendation/services/product/application/subscriber"
 	"github.com/recommendation/services/product/domain"
 	repo "github.com/recommendation/services/product/external/repository"
 )
@@ -42,6 +45,16 @@ func Run() {
 		CategoryViewHistoryRepo: repo.NewCategoryViewHistoryRepo(),
 	})
 	grpcHandler = handler.NewHandler(productDomain)
+
+	psClient, err := factory.NewPubSub(log, appConfig.MessageQueue)
+	if err != nil {
+		logger.Default.Panic("can't connect to pubsub: ", err)
+	}
+	appSubscriber := pubsub.NewAppSubscriber(psClient.Subscriber(), appConfig.MessageQueue.Subscription, nil)
+	subsHandler := subscriber.NewHandler(productDomain)
+	appSubscriber.RegisterEventSubscriber(subsHandler.RouteSetup())
+	appSubscriber.StartReceiving()
+	defer appSubscriber.StopReceiving()
 
 	grpcServe()
 }

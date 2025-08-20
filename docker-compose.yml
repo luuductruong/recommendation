@@ -22,6 +22,11 @@ services:
       POSTGRES_DB: recommendation
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    ports:
+      - "5673:5672" # Use port 5673 due to 5672 in local was bind by another project. This will change to 5672 when deploying
+      - "15673:15672"
 
 volumes:
   postgres_data: # lưu dữ liệu khi chạy docker compose down

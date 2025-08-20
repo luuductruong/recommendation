@@ -48,6 +48,10 @@ type Logger interface {
 	// with appcontext
 	ErrorCtx(context.Context, error, ...interface{})
 	DebugCtx(context.Context, ...interface{})
+
+	// without app context
+	Error(...interface{})
+	Debug(...interface{})
 }
 
 type logger struct {
@@ -85,6 +89,14 @@ func (l *logger) withDefaultFields(ctx ...context.Context) *logrus.Entry {
 		fields = logrus.Fields{locName: locPath}
 	}
 	return l.log.WithFields(fields)
+}
+
+func (l *logger) Error(i ...interface{}) {
+	l.withDefaultFields().Error(i...)
+}
+
+func (l *logger) Debug(i ...interface{}) {
+	l.withDefaultFields().Debug(i...)
 }
 
 // getLocationField returns a key-value pair ("location", value)
