@@ -88,3 +88,35 @@ func (d *domain) recordViewHistory(ctx context.Context, userID string, prod *pro
 	}
 	return
 }
+
+func (d *domain) CreateProduct(ctx context.Context, inp *product.CreateProductInp) (*product.Product, error) {
+	d.logger.DebugCtx(ctx, "CreateProduct with inp:", inp)
+	// validate inp
+	if inp == nil {
+		d.logger.DebugCtx(ctx, "CreateProduct with nil input")
+		return nil, nil
+	}
+	if inp.Name == "" {
+		d.logger.DebugCtx(ctx, "CreateProduct with empty name")
+		return nil, errors.New("name is required")
+	}
+	// count how many product
+	total, err := d.productRepo.Query(ctx).Count()
+	if err != nil {
+		d.logger.ErrorCtx(ctx, err, "Error querying product")
+		return nil, err
+	}
+	newPID := int64(total) + 1
+	newProduct := &product.Product{
+		ProductID:  newPID,
+		Name:       inp.Name,
+		Price:      inp.Price,
+		CategoryID: inp.CategoryID,
+	}
+	err = d.productRepo.Upsert(ctx, newProduct)
+	if err != nil {
+		d.logger.ErrorCtx(ctx, err, "Error upserting product")
+		return nil, err
+	}
+	return newProduct, nil
+}

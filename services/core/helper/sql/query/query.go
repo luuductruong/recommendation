@@ -57,6 +57,16 @@ func OrderBy[I any](bq I, field string, desc bool) I {
 	return bq
 }
 
+// count func
+func Count(bq BaseQuery) (int, error) {
+	var count int64
+	err := bq.GetDB().Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return int(count), nil
+}
+
 // result func
 func Result[S any, D any](bq BaseQuery, mapper func(s *S) *D) (*D, error) {
 	var rs S

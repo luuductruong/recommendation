@@ -6,6 +6,7 @@ import (
 )
 
 type ProductRepo interface {
+	Upsert(ctx context.Context, prod *Product) error
 	Query(ctx context.Context) ProductQuery
 }
 
@@ -17,6 +18,8 @@ type ProductQuery interface {
 	// result
 	Result() (*Product, error)
 	ResultList() ([]*Product, error)
+	// count
+	Count() (int, error)
 }
 
 type UserViewHistoryRepo interface {

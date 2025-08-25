@@ -25,6 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type ProductServiceClient interface {
 	GetProductDetail(ctx context.Context, in *dto.GetProductDetailReq, opts ...grpc.CallOption) (*dto.GetProductDetailResp, error)
 	GetRecommendationForUser(ctx context.Context, in *dto.GetRecommendationForUserReq, opts ...grpc.CallOption) (*dto.GetRecommendationForUserResp, error)
+	CreateProduct(ctx context.Context, in *dto.CreateProductReq, opts ...grpc.CallOption) (*dto.CreateProductResp, error)
 }
 
 type productServiceClient struct {
@@ -53,12 +54,22 @@ func (c *productServiceClient) GetRecommendationForUser(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *productServiceClient) CreateProduct(ctx context.Context, in *dto.CreateProductReq, opts ...grpc.CallOption) (*dto.CreateProductResp, error) {
+	out := new(dto.CreateProductResp)
+	err := c.cc.Invoke(ctx, "/service.ProductService/CreateProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility
 type ProductServiceServer interface {
 	GetProductDetail(context.Context, *dto.GetProductDetailReq) (*dto.GetProductDetailResp, error)
 	GetRecommendationForUser(context.Context, *dto.GetRecommendationForUserReq) (*dto.GetRecommendationForUserResp, error)
+	CreateProduct(context.Context, *dto.CreateProductReq) (*dto.CreateProductResp, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -71,6 +82,9 @@ func (UnimplementedProductServiceServer) GetProductDetail(context.Context, *dto.
 }
 func (UnimplementedProductServiceServer) GetRecommendationForUser(context.Context, *dto.GetRecommendationForUserReq) (*dto.GetRecommendationForUserResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRecommendationForUser not implemented")
+}
+func (UnimplementedProductServiceServer) CreateProduct(context.Context, *dto.CreateProductReq) (*dto.CreateProductResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateProduct not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 
@@ -121,6 +135,24 @@ func _ProductService_GetRecommendationForUser_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_CreateProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(dto.CreateProductReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).CreateProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/service.ProductService/CreateProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).CreateProduct(ctx, req.(*dto.CreateProductReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -135,6 +167,10 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRecommendationForUser",
 			Handler:    _ProductService_GetRecommendationForUser_Handler,
+		},
+		{
+			MethodName: "CreateProduct",
+			Handler:    _ProductService_CreateProduct_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

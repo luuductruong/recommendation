@@ -24,6 +24,17 @@ func mapProductToDm(source *product) *productDm.Product {
 		CategoryID: source.CategoryID,
 	}
 }
+func mapProductFromDm(source *productDm.Product) *product {
+	if source == nil {
+		return nil
+	}
+	return &product{
+		ProductID:  source.ProductID,
+		Name:       source.Name,
+		Price:      source.Price,
+		CategoryID: source.CategoryID,
+	}
+}
 
 func (p product) TableName() string {
 	return "product"
@@ -36,12 +47,20 @@ func NewProductRepo() productDm.ProductRepo {
 type productRepo struct {
 }
 
+func (p *productRepo) Upsert(ctx context.Context, prod *productDm.Product) error {
+	return query.Upsert(ctx.GetDbTx(), prod, mapProductFromDm)
+}
+
 type productQuery struct {
 	query.BaseQuery
 }
 
 func (p *productRepo) Query(ctx context.Context) productDm.ProductQuery {
 	return &productQuery{query.NewBQ(ctx.GetDbTx().Model(&product{}))}
+}
+
+func (p *productQuery) Count() (int, error) {
+	return query.Count(p)
 }
 
 func (p *productQuery) ByProductID(productID int64) productDm.ProductQuery {

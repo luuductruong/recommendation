@@ -241,6 +241,116 @@ func (x *GetRecommendationForUserResp) GetTotal() int32 {
 	return 0
 }
 
+type CreateProductReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name       string  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Price      float64 `protobuf:"fixed64,2,opt,name=price,proto3" json:"price,omitempty"`
+	CategoryId string  `protobuf:"bytes,3,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
+}
+
+func (x *CreateProductReq) Reset() {
+	*x = CreateProductReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_product_dto_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateProductReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateProductReq) ProtoMessage() {}
+
+func (x *CreateProductReq) ProtoReflect() protoreflect.Message {
+	mi := &file_product_dto_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateProductReq.ProtoReflect.Descriptor instead.
+func (*CreateProductReq) Descriptor() ([]byte, []int) {
+	return file_product_dto_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CreateProductReq) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateProductReq) GetPrice() float64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *CreateProductReq) GetCategoryId() string {
+	if x != nil {
+		return x.CategoryId
+	}
+	return ""
+}
+
+type CreateProductResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Product *model.Product `protobuf:"bytes,1,opt,name=product,proto3" json:"product,omitempty"`
+}
+
+func (x *CreateProductResp) Reset() {
+	*x = CreateProductResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_product_dto_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateProductResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateProductResp) ProtoMessage() {}
+
+func (x *CreateProductResp) ProtoReflect() protoreflect.Message {
+	mi := &file_product_dto_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateProductResp.ProtoReflect.Descriptor instead.
+func (*CreateProductResp) Descriptor() ([]byte, []int) {
+	return file_product_dto_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CreateProductResp) GetProduct() *model.Product {
+	if x != nil {
+		return x.Product
+	}
+	return nil
+}
+
 var File_product_dto_proto protoreflect.FileDescriptor
 
 var file_product_dto_proto_rawDesc = []byte{
@@ -269,12 +379,22 @@ var file_product_dto_proto_rawDesc = []byte{
 	0x65, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x6d, 0x6f, 0x64, 0x65, 0x6c,
 	0x2e, 0x56, 0x69, 0x65, 0x77, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x0a, 0x6c, 0x69, 0x73,
 	0x74, 0x56, 0x69, 0x65, 0x77, 0x65, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x42, 0x41, 0x5a,
-	0x3f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x72, 0x65, 0x63, 0x6f,
-	0x6d, 0x6d, 0x65, 0x6e, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x73, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x2f, 0x64, 0x74, 0x6f,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x22, 0x5d, 0x0a,
+	0x10, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x52, 0x65,
+	0x71, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x01, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x63,
+	0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x63, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x49, 0x64, 0x22, 0x3d, 0x0a, 0x11,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x52, 0x65, 0x73,
+	0x70, 0x12, 0x28, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x2e, 0x50, 0x72, 0x6f, 0x64, 0x75,
+	0x63, 0x74, 0x52, 0x07, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x42, 0x41, 0x5a, 0x3f, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x72, 0x65, 0x63, 0x6f, 0x6d, 0x6d,
+	0x65, 0x6e, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x73, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x2f, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x2f, 0x64, 0x74, 0x6f, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -289,23 +409,26 @@ func file_product_dto_proto_rawDescGZIP() []byte {
 	return file_product_dto_proto_rawDescData
 }
 
-var file_product_dto_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_product_dto_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_product_dto_proto_goTypes = []interface{}{
 	(*GetProductDetailReq)(nil),          // 0: dto.GetProductDetailReq
 	(*GetProductDetailResp)(nil),         // 1: dto.GetProductDetailResp
 	(*GetRecommendationForUserReq)(nil),  // 2: dto.GetRecommendationForUserReq
 	(*GetRecommendationForUserResp)(nil), // 3: dto.GetRecommendationForUserResp
-	(*model.Product)(nil),                // 4: model.Product
-	(*model.ViewStatus)(nil),             // 5: model.ViewStatus
+	(*CreateProductReq)(nil),             // 4: dto.CreateProductReq
+	(*CreateProductResp)(nil),            // 5: dto.CreateProductResp
+	(*model.Product)(nil),                // 6: model.Product
+	(*model.ViewStatus)(nil),             // 7: model.ViewStatus
 }
 var file_product_dto_proto_depIdxs = []int32{
-	4, // 0: dto.GetProductDetailResp.product:type_name -> model.Product
-	5, // 1: dto.GetRecommendationForUserResp.list_viewed:type_name -> model.ViewStatus
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	6, // 0: dto.GetProductDetailResp.product:type_name -> model.Product
+	7, // 1: dto.GetRecommendationForUserResp.list_viewed:type_name -> model.ViewStatus
+	6, // 2: dto.CreateProductResp.product:type_name -> model.Product
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_product_dto_proto_init() }
@@ -362,6 +485,30 @@ func file_product_dto_proto_init() {
 				return nil
 			}
 		}
+		file_product_dto_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateProductReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_product_dto_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateProductResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -369,7 +516,7 @@ func file_product_dto_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_product_dto_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

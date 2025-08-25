@@ -50,3 +50,18 @@ func (h *handler) GetRecommendationForUser(ctx context.Context, req *dto.GetReco
 		Total:      int32(len(recomment)),
 	}, nil
 }
+
+func (h *handler) CreateProduct(ctx context.Context, req *dto.CreateProductReq) (*dto.CreateProductResp, error) {
+	appCtx := appContext.FromContext(ctx)
+	prod, err := h.productDomain.CreateProduct(appCtx, &product.CreateProductInp{
+		Name:       req.Name,
+		Price:      req.Price,
+		CategoryID: req.CategoryId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &dto.CreateProductResp{
+		Product: dto.MapProductFromDm(prod),
+	}, nil
+}

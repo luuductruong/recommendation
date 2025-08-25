@@ -25,3 +25,13 @@ message GetRecommendationForUserResp {
   repeated model.ViewStatus list_viewed = 1;
   int32 total = 2;
 }
+
+message CreateProductReq{
+  string name = 1;
+  double price = 2;
+  string category_id = 3;
+}
+
+message CreateProductResp{
+  model.Product product = 1;
+}

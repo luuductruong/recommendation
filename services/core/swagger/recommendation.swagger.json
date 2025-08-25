@@ -16,6 +16,32 @@
     "application/json"
   ],
   "paths": {
+    "/v1/product/create": {
+      "post": {
+        "operationId": "ProductService_CreateProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dtoCreateProductResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dtoCreateProductReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
     "/v1/product/detail": {
       "post": {
         "operationId": "ProductService_GetProductDetail",
@@ -70,6 +96,29 @@
     }
   },
   "definitions": {
+    "dtoCreateProductReq": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "format": "double"
+        },
+        "category_id": {
+          "type": "string"
+        }
+      }
+    },
+    "dtoCreateProductResp": {
+      "type": "object",
+      "properties": {
+        "product": {
+          "$ref": "#/definitions/modelProduct"
+        }
+      }
+    },
     "dtoGetProductDetailReq": {
       "type": "object",
       "properties": {

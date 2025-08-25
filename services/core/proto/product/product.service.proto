@@ -21,4 +21,10 @@ service ProductService {
       body: "*"
     };
   }
+  rpc CreateProduct(dto.CreateProductReq) returns (dto.CreateProductResp) {
+    option (google.api.http) = {
+      post: "/v1/product/create"
+      body: "*"
+    };
+  }
 }

@@ -10,3 +10,9 @@ type GetRecommendationForUserInp struct {
 	ProductID int64
 	Limit     int32
 }
+
+type CreateProductInp struct {
+	Name       string
+	Price      float64
+	CategoryID string
+}
